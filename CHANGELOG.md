@@ -43,6 +43,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- v1.1.0 Authentication Enhancement features
+
+## [1.1.0] - 2026-03-08
+
+### Added
+- Change password functionality for authenticated users
+- Password validation (new password must differ from current)
+- Password confirmation matching
+- Comprehensive unit tests for password change feature
+- `/api/users/change-password` endpoint with JWT authentication
+
+### Security
+- Current password verification before allowing change
+- BCrypt encryption for new passwords
+- Authenticated users can only change their own password
+
 ### Planned Features
 - Refresh token mechanism
 - Email verification

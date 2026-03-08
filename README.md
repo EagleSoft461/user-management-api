@@ -32,6 +32,7 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 
 ## 📋 Features
 
+### v1.0.0 (Released)
 - ✅ JWT-based authentication
 - ✅ BCrypt password encryption
 - ✅ Role-based access control (USER, ADMIN)
@@ -41,6 +42,12 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - ✅ Swagger UI documentation
 - ✅ Unit & Integration tests
 - ✅ Docker support
+
+### v1.1.0 (In Progress)
+- ✅ Change password functionality
+- 🚧 Refresh token mechanism
+- 🚧 Email verification
+- 🚧 Password reset
 
 ## 🏗️ Architecture
 
@@ -107,6 +114,7 @@ The application will start at `http://localhost:8081`
 | GET | `/api/users/{id}` | Get user details | ✅ ADMIN |
 | DELETE | `/api/users/{id}` | Deactivate user | ✅ ADMIN |
 | PUT | `/api/users/{id}/roles/{roleName}` | Add role to user | ✅ ADMIN |
+| POST | `/api/users/change-password` | Change password | ✅ USER |
 
 ## 📖 API Documentation
 
@@ -153,6 +161,19 @@ curl -X POST http://localhost:8081/auth/login \
 ```bash
 curl -X GET http://localhost:8081/api/users \
   -H "Authorization: Bearer <your-jwt-token>"
+```
+
+### Change Password (v1.1.0)
+
+```bash
+curl -X POST http://localhost:8081/api/users/change-password \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currentPassword": "password123",
+    "newPassword": "newPassword456",
+    "confirmPassword": "newPassword456"
+  }'
 ```
 
 ## 🧪 Testing
@@ -246,6 +267,18 @@ JWT_EXPIRATION=86400000
 - [ ] User profile management
 - [ ] Audit logging
 - [ ] Two-factor authentication (2FA)
+
+## 📝 Roadmap
+
+See our detailed [ROADMAP.md](ROADMAP.md) for planned features and timeline.
+
+### Next Release: v1.1.0
+- Refresh token mechanism
+- Email verification  
+- Password reset functionality
+- Account management
+
+[View Full Roadmap →](ROADMAP.md)
 
 ## 📄 License
 
