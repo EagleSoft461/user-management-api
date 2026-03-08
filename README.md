@@ -286,7 +286,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👤 Author
 
-**Your Name**
+**EagleSoft461**
 - GitHub: [@Ali Orhan-Cy979](https://github.com/EagleSoft461)
 - LinkedIn: [ALİ ORHAN OK](https://www.linkedin.com/in/ali-orhan-ok-309a2a38a/)
 - Email: aliorhanok78@gmail.com
