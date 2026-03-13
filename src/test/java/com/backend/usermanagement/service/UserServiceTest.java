@@ -189,4 +189,62 @@ class UserServiceTest {
 
         verify(userRepository, never()).save(any(User.class));
     }
+
+    @Test
+    void deactivateAccount_Success() {
+        String email = "[email]";
+        String password = "password123";
+        String encodedPassword = "encodedPassword";
+
+        User user = new User(email, encodedPassword);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        assertDoesNotThrow(() -> {
+            userService.deactivateAccount(email, password);
+        });
+
+        assertFalse(user.isActive());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void deactivateAccount_AlreadyDeactivated_ThrowsException() {
+        String email = "[email]";
+        String password = "password123";
+        String encodedPassword = "encodedPassword";
+
+        User user = new User(email, encodedPassword);
+        user.deactivate();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.deactivateAccount(email, password);
+        });
+
+        assertEquals("Account is already deactivated", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void deactivateAccount_IncorrectPassword_ThrowsException() {
+        String email = "[email]";
+        String password = "wrongPassword";
+        String encodedPassword = "encodedPassword";
+
+        User user = new User(email, encodedPassword);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.deactivateAccount(email, password);
+        });
+
+        assertEquals("Incorrect password", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
 }

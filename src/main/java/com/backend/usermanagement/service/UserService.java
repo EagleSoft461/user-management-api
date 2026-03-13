@@ -113,5 +113,23 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
     }
-}
 
+    public void deactivateAccount(String email, String password) {
+        // Find user
+        User user = findByEmail(email);
+
+        // Check if already deactivated
+        if (!user.isActive()) {
+            throw new IllegalArgumentException("Account is already deactivated");
+        }
+
+        // Verify password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password");
+        }
+
+        // Deactivate account
+        user.deactivate();
+        userRepository.save(user);
+    }
+}
