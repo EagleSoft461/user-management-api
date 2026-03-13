@@ -13,9 +13,35 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 ![Swagger UI](docs/images/swagger-ui.png)
 *API Documentation - All endpoints can be tested interactively*
 
-### API Response
-![API Response](docs/images/api-response.png)
-*Successful authentication with JWT Token*
+### v1.1.0 Features
+
+#### Register Response
+![Register Response](docs/images/register-response.png)
+*User registration with access token and refresh token*
+
+#### Login Response
+![Login Response](docs/images/login-response.png)
+*User login with JWT tokens*
+
+#### Refresh Token
+![Refresh Token](docs/images/refresh-token-response.png)
+*Token refresh with rotation - old token revoked, new tokens issued*
+
+#### Forgot Password
+![Forgot Password](docs/images/forgot-password-response.png)
+*Password reset token generation*
+
+#### Reset Password
+![Reset Password](docs/images/reset-password-response.png)
+*Password reset with token*
+
+#### Change Password
+![Change Password](docs/images/change-password-response.png)
+*Authenticated user changing password*
+
+#### Deactivate Account
+![Deactivate Account](docs/images/deactivate-account-response.png)
+*User deactivating their own account*
 
 ## 🚀 Technologies
 
@@ -32,6 +58,7 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 
 ## 📋 Features
 
+### v1.0.0 (Released)
 - ✅ JWT-based authentication
 - ✅ BCrypt password encryption
 - ✅ Role-based access control (USER, ADMIN)
@@ -41,6 +68,17 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - ✅ Swagger UI documentation
 - ✅ Unit & Integration tests
 - ✅ Docker support
+
+### v1.1.0 (Released)
+- ✅ Change password functionality
+- ✅ Account deactivation (soft delete)
+- ✅ Password reset with token
+- ✅ Refresh token mechanism with rotation
+
+### v1.2.0 (Planned)
+- 🚧 Email verification
+- 🚧 Rate limiting
+- 🚧 Redis caching
 
 ## 🏗️ Architecture
 
@@ -98,6 +136,9 @@ The application will start at `http://localhost:8081`
 |--------|----------|-------------|---------------|
 | POST | `/auth/register` | Register new user | ❌ |
 | POST | `/auth/login` | User login | ❌ |
+| POST | `/auth/refresh` | Refresh access token | ❌ |
+| POST | `/auth/forgot-password` | Request password reset | ❌ |
+| POST | `/auth/reset-password` | Reset password with token | ❌ |
 
 ### User Management
 
@@ -107,6 +148,8 @@ The application will start at `http://localhost:8081`
 | GET | `/api/users/{id}` | Get user details | ✅ ADMIN |
 | DELETE | `/api/users/{id}` | Deactivate user | ✅ ADMIN |
 | PUT | `/api/users/{id}/roles/{roleName}` | Add role to user | ✅ ADMIN |
+| POST | `/api/users/change-password` | Change password | ✅ USER |
+| POST | `/api/users/deactivate` | Deactivate own account | ✅ USER |
 
 ## 📖 API Documentation
 
@@ -153,6 +196,62 @@ curl -X POST http://localhost:8081/auth/login \
 ```bash
 curl -X GET http://localhost:8081/api/users \
   -H "Authorization: Bearer <your-jwt-token>"
+```
+
+### Change Password
+
+```bash
+curl -X POST http://localhost:8081/api/users/change-password \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currentPassword": "password123",
+    "newPassword": "newPassword456",
+    "confirmPassword": "newPassword456"
+  }'
+```
+
+### Deactivate Account
+
+```bash
+curl -X POST http://localhost:8081/api/users/deactivate \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "password": "password123"
+  }'
+```
+
+### Forgot Password
+
+```bash
+curl -X POST http://localhost:8081/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+```
+
+### Reset Password
+
+```bash
+curl -X POST http://localhost:8081/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "reset-token-from-email",
+    "newPassword": "newPassword456",
+    "confirmPassword": "newPassword456"
+  }'
+```
+
+### Refresh Token
+
+```bash
+curl -X POST http://localhost:8081/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "your-refresh-token"
+  }'
 ```
 
 ## 🧪 Testing
@@ -246,6 +345,18 @@ JWT_EXPIRATION=86400000
 - [ ] User profile management
 - [ ] Audit logging
 - [ ] Two-factor authentication (2FA)
+
+## 📝 Roadmap
+
+See our detailed [ROADMAP.md](ROADMAP.md) for planned features and timeline.
+
+### Next Release: v1.1.0
+- Refresh token mechanism
+- Email verification  
+- Password reset functionality
+- Account management
+
+[View Full Roadmap →](ROADMAP.md)
 
 ## 📄 License
 

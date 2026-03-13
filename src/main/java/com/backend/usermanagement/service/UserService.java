@@ -77,6 +77,31 @@ public class UserService {
         return convertToResponse(user);
     }
 
+    public void changePassword(String email, String currentPassword, String newPassword, String confirmPassword) {
+        // Validate new password and confirm password match
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("New password and confirm password do not match");
+        }
+
+        // Validate new password is different from current
+        if (currentPassword.equals(newPassword)) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        // Find user
+        User user = findByEmail(email);
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // Encode and save new password
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.changePassword(encodedNewPassword);
+        userRepository.save(user);
+    }
+
     private UserResponse convertToResponse(User user) {
         return new UserResponse(
                 user.getId(),
@@ -88,5 +113,23 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
     }
-}
 
+    public void deactivateAccount(String email, String password) {
+        // Find user
+        User user = findByEmail(email);
+
+        // Check if already deactivated
+        if (!user.isActive()) {
+            throw new IllegalArgumentException("Account is already deactivated");
+        }
+
+        // Verify password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password");
+        }
+
+        // Deactivate account
+        user.deactivate();
+        userRepository.save(user);
+    }
+}

@@ -1,0 +1,44 @@
+package com.backend.usermanagement.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class ChangePasswordRequest {
+
+    @NotBlank(message = "Current password cannot be blank")
+    private String currentPassword;
+
+    @NotBlank(message = "New password cannot be blank")
+    @Size(min = 6, message = "New password must be at least 6 characters")
+    private String newPassword;
+
+    @NotBlank(message = "Confirm password cannot be blank")
+    private String confirmPassword;
+
+    public ChangePasswordRequest() {
+    }
+
+    public String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+}

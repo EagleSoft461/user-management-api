@@ -1,12 +1,17 @@
 package com.backend.usermanagement.controller;
 
+import com.backend.usermanagement.dto.request.ChangePasswordRequest;
+import com.backend.usermanagement.dto.request.DeactivateAccountRequest;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,4 +56,26 @@ public class UserController {
     public ResponseEntity<UserResponse> addRoleToUser(@PathVariable Long id, @PathVariable String roleName) {
         return ResponseEntity.ok(userService.updateUserRole(id, roleName));
     }
+
+    @PostMapping("/change-password")
+    @Operation(summary = "Change password", description = "Change the password for the authenticated user")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request,
+                                                   @AuthenticationPrincipal UserDetails userDetails) {
+        userService.changePassword(
+                userDetails.getUsername(),
+                request.getCurrentPassword(),
+                request.getNewPassword(),
+                request.getConfirmPassword()
+        );
+        return ResponseEntity.ok("Password changed successfully");
+    }
+
+    @PostMapping("/deactivate")
+    @Operation(summary = "Deactivate account", description = "Deactivate the authenticated user's account")
+    public ResponseEntity<String> deactivateAccount(@Valid @RequestBody DeactivateAccountRequest request,
+                                                      @AuthenticationPrincipal UserDetails userDetails) {
+        userService.deactivateAccount(userDetails.getUsername(), request.getPassword());
+        return ResponseEntity.ok("Account deactivated successfully");
+    }
 }
+
