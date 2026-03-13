@@ -1,6 +1,7 @@
 package com.backend.usermanagement.controller;
 
 import com.backend.usermanagement.dto.request.ChangePasswordRequest;
+import com.backend.usermanagement.dto.request.DeactivateAccountRequest;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,6 +68,14 @@ public class UserController {
                 request.getConfirmPassword()
         );
         return ResponseEntity.ok("Password changed successfully");
+    }
+
+    @PostMapping("/deactivate")
+    @Operation(summary = "Deactivate account", description = "Deactivate the authenticated user's account")
+    public ResponseEntity<String> deactivateAccount(@Valid @RequestBody DeactivateAccountRequest request,
+                                                      @AuthenticationPrincipal UserDetails userDetails) {
+        userService.deactivateAccount(userDetails.getUsername(), request.getPassword());
+        return ResponseEntity.ok("Account deactivated successfully");
     }
 }
 

@@ -2,7 +2,7 @@
 
 This document outlines the planned features and improvements for the User Management API.
 
-## Current Version: v1.0.0 ✅
+## Current Version: v1.1.0 ✅
 
 ### Completed Features
 - ✅ JWT-based authentication
@@ -16,20 +16,24 @@ This document outlines the planned features and improvements for the User Manage
 - ✅ PostgreSQL database integration
 - ✅ Docker Compose setup
 - ✅ Unit & Integration tests
+- ✅ Change password functionality
+- ✅ Account deactivation (soft delete)
+- ✅ Password reset with tokens
+- ✅ Refresh token mechanism
 
 ---
 
 ## v1.1.0 - Authentication Enhancement 🔐
 **Target: March 2026**
 **Priority: High**
-**Status: In Progress** 🚧
+**Status: Completed** ✅
 
 ### Features
-- [ ] Refresh Token mechanism
-  - Generate refresh tokens on login
-  - Refresh access token endpoint
-  - Token rotation strategy
-  - Revoke refresh tokens
+- [x] Refresh Token mechanism
+  - ✅ Generate refresh tokens on login (7-day validity)
+  - ✅ Refresh access token endpoint
+  - ✅ Token rotation strategy
+  - ✅ Revoke refresh tokens
 
 - [ ] Email Verification
   - Send verification email on registration
@@ -37,30 +41,42 @@ This document outlines the planned features and improvements for the User Manage
   - Resend verification email endpoint
   - Account activation flow
 
-- [ ] Password Reset
-  - Forgot password endpoint
-  - Password reset token via email
-  - Reset password with token
-  - Password reset confirmation
+- [x] Password Reset
+  - ✅ Forgot password endpoint
+  - ✅ Password reset token via email (15-minute expiry)
+  - ✅ Reset password with token
+  - ✅ Password reset confirmation
 
 - [x] Account Management
   - ✅ Change password (authenticated users) - **Completed 2026-03-08**
+  - ✅ Account deactivation by user - **Completed 2026-03-13**
   - [ ] Email change with verification
-  - [ ] Account deactivation by user
 
 ### Learning Goals
-- JavaMailSender integration
-- Token expiration strategies
-- Email template design
-- Asynchronous email sending
+- ✅ Token expiration strategies
+- ✅ Token rotation and revocation
+- ✅ Transaction management
+- 🚧 JavaMailSender integration (deferred to v1.2.0)
+- 🚧 Email template design (deferred to v1.2.0)
+- 🚧 Asynchronous email sending (deferred to v1.2.0)
 
 ---
 
-## v1.2.0 - Security & Performance 🛡️
+## v1.2.0 - Email & Security Enhancement 📧
 **Target: April 2026**
 **Priority: High**
+**Status: Planned**
 
 ### Features
+- [ ] Email Verification
+  - Send verification email on registration
+  - Email verification token
+  - Resend verification email endpoint
+  - Account activation flow
+  - JavaMailSender integration
+  - Email templates
+
+- [ ] Rate Limiting
 - [ ] Rate Limiting
   - Login attempt limiting
   - API rate limiting per user
@@ -86,16 +102,19 @@ This document outlines the planned features and improvements for the User Manage
   - Security headers middleware
 
 ### Learning Goals
+- JavaMailSender integration
+- Email template design
+- Asynchronous email sending
 - Redis integration
 - Caching strategies
 - Rate limiting algorithms
-- Production logging practices
 
 ---
 
-## v1.3.0 - User Experience 👤
+## v1.3.0 - Security & Performance 🛡️
 **Target: May 2026**
-**Priority: Medium**
+**Priority: High**
+**Status: Planned**
 
 ### Features
 - [ ] User Profile Management
@@ -123,16 +142,16 @@ This document outlines the planned features and improvements for the User Manage
   - Force password change
 
 ### Learning Goals
-- File upload handling
-- Image processing
-- AWS S3 integration
-- User preference management
+- Structured logging
+- Production monitoring
+- Security best practices
 
 ---
 
-## v1.4.0 - Admin Features 👨‍💼
+## v1.4.0 - User Experience 👤
 **Target: June 2026**
 **Priority: Medium**
+**Status: Planned**
 
 ### Features
 - [ ] User Management
@@ -160,16 +179,17 @@ This document outlines the planned features and improvements for the User Manage
   - Filter and search logs
 
 ### Learning Goals
-- Advanced JPA queries
-- Pagination strategies
-- Data export functionality
-- Audit logging patterns
+- File upload handling
+- Image processing
+- AWS S3 integration
+- User preference management
 
 ---
 
-## v2.0.0 - Major Update 🚀
-**Target: August 2026**
-**Priority: High**
+## v1.5.0 - Admin Features 👨‍💼
+**Target: July 2026**
+**Priority: Medium**
+**Status: Planned**
 
 ### Features
 - [ ] Two-Factor Authentication (2FA)
@@ -203,16 +223,17 @@ This document outlines the planned features and improvements for the User Manage
   - Geolocation tracking
 
 ### Learning Goals
-- OAuth2 protocol
-- Third-party API integration
-- WebSocket programming
-- API versioning strategies
+- Advanced JPA queries
+- Pagination strategies
+- Data export functionality
+- Audit logging patterns
 
 ---
 
-## v2.1.0 - Enterprise Features 🏢
-**Target: October 2026**
-**Priority: Low**
+## v2.0.0 - Major Update 🚀
+**Target: September 2026**
+**Priority: High**
+**Status: Planned**
 
 ### Features
 - [ ] Multi-Tenancy
@@ -240,16 +261,17 @@ This document outlines the planned features and improvements for the User Manage
   - Concurrent session control
 
 ### Learning Goals
-- Multi-tenancy patterns
-- Advanced security concepts
-- Session management strategies
-- Enterprise architecture
+- OAuth2 protocol
+- Third-party API integration
+- WebSocket programming
+- API versioning strategies
 
 ---
 
-## v3.0.0 - Microservices Architecture 🌐
-**Target: 2027**
-**Priority: Future**
+## v2.1.0 - Enterprise Features 🏢
+**Target: November 2026**
+**Priority: Low**
+**Status: Planned**
 
 ### Features
 - [ ] Service Discovery
@@ -339,6 +361,6 @@ Have suggestions for the roadmap?
 
 ---
 
-**Last Updated:** February 28, 2026
-**Current Version:** v1.0.0
-**Next Release:** v1.1.0 (Target: March 2026)
+**Last Updated:** March 13, 2026
+**Current Version:** v1.1.0
+**Next Release:** v1.2.0 (Target: April 2026)

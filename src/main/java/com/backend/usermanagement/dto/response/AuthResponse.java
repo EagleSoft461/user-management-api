@@ -2,25 +2,51 @@ package com.backend.usermanagement.dto.response;
 
 public class AuthResponse {
 
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private String email;
     private String message;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, String email, String message) {
-        this.token = token;
+    public AuthResponse(String accessToken, String refreshToken, String email, String message) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.email = email;
         this.message = message;
     }
 
+    // Backward compatibility constructor
+    public AuthResponse(String token, String email, String message) {
+        this.accessToken = token;
+        this.email = email;
+        this.message = message;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    // Backward compatibility
     public String getToken() {
-        return token;
+        return accessToken;
     }
 
     public void setToken(String token) {
-        this.token = token;
+        this.accessToken = token;
     }
 
     public String getEmail() {

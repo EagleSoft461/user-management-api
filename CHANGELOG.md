@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-03-13
+
+### Added
+- Change password functionality for authenticated users
+- Account deactivation (soft delete) by user with password verification
+- Password reset flow with time-limited tokens (15 minutes)
+- Refresh token mechanism with 7-day validity
+- Token rotation strategy (old refresh token revoked when new one issued)
+- `/api/users/change-password` endpoint with JWT authentication
+- `/api/users/deactivate` endpoint for self-service account deactivation
+- `/auth/forgot-password` endpoint to generate password reset token
+- `/auth/reset-password` endpoint to reset password with token
+- `/auth/refresh` endpoint to obtain new access token
+- `PasswordResetToken` entity with expiration tracking
+- `RefreshToken` entity with revocation support
+- Comprehensive unit tests for all new features
+
+### Security
+- Current password verification before allowing change
+- Password confirmation matching validation
+- Password reset tokens expire after 15 minutes
+- Refresh tokens expire after 7 days
+- All refresh tokens revoked on password reset (force re-login)
+- Single-use refresh tokens (token rotation)
+- BCrypt encryption for all password operations
+
+### Technical
+- `PasswordResetTokenRepository` with cleanup methods
+- `RefreshTokenRepository` with token management
+- `RefreshTokenService` for token lifecycle management
+- Enhanced `AuthService` with password reset and token refresh
+- Transaction management for all critical operations
+
 ## [1.0.0] - 2026-02-28
 
 ### Added
@@ -43,29 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### In Progress
-- v1.1.0 Authentication Enhancement features
-
-## [1.1.0] - 2026-03-08
-
-### Added
-- Change password functionality for authenticated users
-- Password validation (new password must differ from current)
-- Password confirmation matching
-- Comprehensive unit tests for password change feature
-- `/api/users/change-password` endpoint with JWT authentication
-
-### Security
-- Current password verification before allowing change
-- BCrypt encryption for new passwords
-- Authenticated users can only change their own password
-
-### Planned Features
-- Refresh token mechanism
+### Planned for v1.2.0
 - Email verification
-- Password reset functionality
 - Rate limiting
 - Redis caching
-- User profile management
-- Audit logging
-- Two-factor authentication (2FA)
