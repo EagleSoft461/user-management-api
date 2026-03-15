@@ -22,6 +22,9 @@ public class User {
     @Column(name = "is_active")
     private boolean active = true;
 
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -67,6 +70,14 @@ public class User {
 
     public void deactivate() {
         this.active = false;
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
     }
 
     public void changePassword(String encodedPassword) {

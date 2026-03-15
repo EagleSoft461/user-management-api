@@ -1,9 +1,11 @@
 package com.backend.usermanagement.service;
 
+import com.backend.usermanagement.domain.entity.EmailVerificationToken;
 import com.backend.usermanagement.domain.entity.PasswordResetToken;
 import com.backend.usermanagement.domain.entity.RefreshToken;
 import com.backend.usermanagement.domain.entity.User;
 import com.backend.usermanagement.dto.response.AuthResponse;
+import com.backend.usermanagement.repository.EmailVerificationTokenRepository;
 import com.backend.usermanagement.repository.PasswordResetTokenRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import com.backend.usermanagement.security.JwtUtil;
@@ -23,24 +25,30 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final EmailService emailService;
 
-    public AuthService(AuthenticationManager authenticationManager, 
-                      JwtUtil jwtUtil, 
+    public AuthService(AuthenticationManager authenticationManager,
+                      JwtUtil jwtUtil,
                       UserService userService,
                       PasswordResetTokenRepository passwordResetTokenRepository,
+                      EmailVerificationTokenRepository emailVerificationTokenRepository,
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder,
-                      RefreshTokenService refreshTokenService) {
+                      RefreshTokenService refreshTokenService,
+                      EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -70,7 +78,11 @@ public class AuthService {
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(accessToken, refreshToken.getToken(), email, "Registration successful");
+        // Generate email verification token and send email
+        sendVerificationEmail(user);
+
+        return new AuthResponse(accessToken, refreshToken.getToken(), email, 
+                "Registration successful. Please check your email to verify your account.");
     }
 
     @Transactional
@@ -112,10 +124,60 @@ public class AuthService {
         PasswordResetToken resetToken = new PasswordResetToken(token, user, expiryDate);
         passwordResetTokenRepository.save(resetToken);
         
-        // In production, send email here
-        // emailService.sendPasswordResetEmail(user.getEmail(), token);
+        // Send email with reset link
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
         
         return token;
+    }
+
+    // Verify email with token
+    @Transactional
+    public void verifyEmail(String token) {
+        // Find token in DB
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
+
+        // Check if expired
+        if (verificationToken.isExpired()) {
+            emailVerificationTokenRepository.delete(verificationToken);
+            throw new IllegalArgumentException("Verification token has expired. Please request a new one.");
+        }
+
+        // Mark user as verified
+        User user = verificationToken.getUser();
+        user.verifyEmail();
+        userRepository.save(user);
+
+        // Delete used token
+        emailVerificationTokenRepository.delete(verificationToken);
+    }
+
+    // Resend verification email (if token expired or email not received)
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        User user = userService.findByEmail(email);
+
+        if (user.isEmailVerified()) {
+            throw new IllegalStateException("Email is already verified");
+        }
+
+        sendVerificationEmail(user);
+    }
+
+    // Helper: Generate token and send verification email
+    private void sendVerificationEmail(User user) {
+        // Delete old token if exists
+        emailVerificationTokenRepository.deleteByUser(user);
+
+        // Generate UUID token, valid for 24 hours
+        String token = java.util.UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusHours(24);
+
+        EmailVerificationToken verificationToken = new EmailVerificationToken(token, user, expiryDate);
+        emailVerificationTokenRepository.save(verificationToken);
+
+        // Send email
+        emailService.sendVerificationEmail(user.getEmail(), token);
     }
     
     @Transactional

@@ -64,4 +64,20 @@ public class AuthController {
         AuthResponse response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
+
+    // GET endpoint - kullanıcı emaildeki linke tıklayınca çalışır
+    @GetMapping("/verify-email")
+    @Operation(summary = "Verify email", description = "Verifies user email with token from email link")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.ok("Email verified successfully. You can now login.");
+    }
+
+    // POST endpoint - token süresi dolarsa yeni email ister
+    @PostMapping("/resend-verification")
+    @Operation(summary = "Resend verification email", description = "Resends email verification link")
+    public ResponseEntity<String> resendVerification(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.resendVerificationEmail(request.getEmail());
+        return ResponseEntity.ok("Verification email sent. Please check your inbox.");
+    }
 }
