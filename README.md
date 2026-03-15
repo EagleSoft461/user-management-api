@@ -43,6 +43,14 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 ![Deactivate Account](docs/images/deactivate-account-response.png)
 *User deactivating their own account*
 
+#### Email Verification
+![Verification Email](docs/images/verification-email.png)
+*Verification email sent after registration*
+
+#### Email Verified
+![Email Verified](docs/images/email-verified.png)
+*Successful email verification*
+
 ## 🚀 Technologies
 
 - **Java 17** - LTS version
@@ -75,8 +83,8 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - ✅ Password reset with token
 - ✅ Refresh token mechanism with rotation
 
-### v1.2.0 (Planned)
-- 🚧 Email verification
+### v1.2.0 (In Progress)
+- ✅ Email verification on registration
 - 🚧 Rate limiting
 - 🚧 Redis caching
 
@@ -139,6 +147,8 @@ The application will start at `http://localhost:8081`
 | POST | `/auth/refresh` | Refresh access token | ❌ |
 | POST | `/auth/forgot-password` | Request password reset | ❌ |
 | POST | `/auth/reset-password` | Reset password with token | ❌ |
+| GET | `/auth/verify-email` | Verify email with token | ❌ |
+| POST | `/auth/resend-verification` | Resend verification email | ❌ |
 
 ### User Management
 
@@ -325,7 +335,13 @@ SPRING_DATASOURCE_PASSWORD=admin
 # JWT
 JWT_SECRET=your-secret-key
 JWT_EXPIRATION=86400000
+
+# Email (Gmail SMTP)
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
 ```
+
+Copy `.env.example` to `.env` and fill in your values. Never commit `.env` to git!
 
 ## 🤝 Contributing
 
