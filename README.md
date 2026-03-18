@@ -43,6 +43,18 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 ![Deactivate Account](docs/images/deactivate-account-response.png)
 *User deactivating their own account*
 
+#### Email Verification
+![Verification Email](docs/images/verification-email.png)
+*Verification email sent after registration*
+
+#### Email Verified
+![Email Verified](docs/images/email-verified.png)
+*Successful email verification*
+
+#### Rate Limiting
+![Rate Limit Response](docs/images/rate-limit-response.png)
+*429 Too Many Requests - brute force protection in action*
+
 ## 🚀 Technologies
 
 - **Java 17** - LTS version
@@ -75,9 +87,9 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - ✅ Password reset with token
 - ✅ Refresh token mechanism with rotation
 
-### v1.2.0 (Planned)
-- 🚧 Email verification
-- 🚧 Rate limiting
+### v1.2.0 (In Progress)
+- ✅ Email verification on registration
+- ✅ Rate limiting (Bucket4j) - brute force protection
 - 🚧 Redis caching
 
 ## 🏗️ Architecture
@@ -284,10 +296,16 @@ curl -X POST http://localhost:8081/auth/refresh \
 ## 🔒 Security
 
 - Passwords are hashed with BCrypt
-- JWT tokens are valid for 24 hours
-- CORS configuration available
+- JWT tokens are valid for 15 minutes
+- Refresh tokens valid for 7 days with rotation
 - Role-based authorization
 - Input validation
+- Email verification on registration
+- Rate limiting per IP address:
+  - Login: 5 requests/minute
+  - Register: 3 requests/minute
+  - Forgot password: 3 requests/minute
+  - General API: 30 requests/minute
 
 ## 🐳 Docker
 
