@@ -43,14 +43,6 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 ![Deactivate Account](docs/images/deactivate-account-response.png)
 *User deactivating their own account*
 
-#### Email Verification
-![Verification Email](docs/images/verification-email.png)
-*Verification email sent after registration*
-
-#### Email Verified
-![Email Verified](docs/images/email-verified.png)
-*Successful email verification*
-
 #### Rate Limiting
 ![Rate Limit Response](docs/images/rate-limit-response.png)
 *429 Too Many Requests - brute force protection in action*
