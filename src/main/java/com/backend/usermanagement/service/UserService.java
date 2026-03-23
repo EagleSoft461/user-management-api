@@ -5,6 +5,8 @@ import com.backend.usermanagement.domain.entity.User;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.repository.RoleRepository;
 import com.backend.usermanagement.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,18 +47,21 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }
 
+    @Cacheable("users")  // Cache key: "users" - tüm liste için
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "users", key = "#id")  // Cache key: "users::1", "users::2", ...
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return convertToResponse(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)  // User silinince cache temizle
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
@@ -64,6 +69,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)  // Rol değişince cache temizle
     public UserResponse updateUserRole(Long userId, String roleName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
@@ -77,6 +83,7 @@ public class UserService {
         return convertToResponse(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)  // Şifre değişince cache temizle
     public void changePassword(String email, String currentPassword, String newPassword, String confirmPassword) {
         // Validate new password and confirm password match
         if (!newPassword.equals(confirmPassword)) {
@@ -114,6 +121,7 @@ public class UserService {
         );
     }
 
+    @CacheEvict(value = "users", allEntries = true)  // Hesap deaktive edilince cache temizle
     public void deactivateAccount(String email, String password) {
         // Find user
         User user = findByEmail(email);

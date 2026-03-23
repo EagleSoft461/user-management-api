@@ -57,7 +57,7 @@ public class AuthService {
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(accessToken, refreshToken.getToken(), email, "Login successful");
+        return new AuthResponse(user.getId(), accessToken, refreshToken.getToken(), email, "Login successful");
     }
 
     @Transactional
@@ -70,7 +70,7 @@ public class AuthService {
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(accessToken, refreshToken.getToken(), email, "Registration successful");
+        return new AuthResponse(user.getId(), accessToken, refreshToken.getToken(), email, "Registration successful");
     }
 
     @Transactional

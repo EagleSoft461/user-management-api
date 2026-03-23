@@ -2,12 +2,21 @@ package com.backend.usermanagement.dto.response;
 
 public class AuthResponse {
 
+    private Long id;
     private String accessToken;
     private String refreshToken;
     private String email;
     private String message;
 
     public AuthResponse() {
+    }
+
+    public AuthResponse(Long id, String accessToken, String refreshToken, String email, String message) {
+        this.id = id;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.email = email;
+        this.message = message;
     }
 
     public AuthResponse(String accessToken, String refreshToken, String email, String message) {
@@ -22,6 +31,14 @@ public class AuthResponse {
         this.accessToken = token;
         this.email = email;
         this.message = message;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getAccessToken() {

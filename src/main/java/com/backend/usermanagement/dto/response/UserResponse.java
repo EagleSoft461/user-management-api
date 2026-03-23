@@ -1,9 +1,12 @@
 package com.backend.usermanagement.dto.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public class UserResponse {
+public class UserResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private String email;
