@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-23
+
+### Added
+- Email verification on user registration (Gmail SMTP)
+- `GET /auth/verify-email` endpoint with token-based verification
+- `POST /auth/resend-verification` endpoint to resend verification email
+- IP-based rate limiting with Bucket4j token bucket algorithm
+  - Login: 5 requests/minute
+  - Register: 3 requests/minute
+  - Forgot password: 3 requests/minute
+  - General API: 30 requests/minute
+- Redis caching for user data with 5-minute TTL
+  - `GET /api/users` — full list cached
+  - `GET /api/users/{id}` — per-user cache with key `users::{id}`
+  - Automatic cache eviction on write operations
+- `EmailVerificationToken` entity with 24-hour expiry
+- `CacheConfig` with JSON serialization for Redis
+- Docker Compose updated with Redis 7 service
+
+### Security
+- Email verification required before login
+- Rate limiting prevents brute-force attacks (429 Too Many Requests)
+- Email credentials stored as environment variables (never hardcoded)
+
+### Technical
+- `spring-boot-starter-data-redis` dependency added
+- `bucket4j-core` dependency added
+- `spring-boot-starter-mail` dependency added
+- `UserResponse` implements `Serializable` for Redis serialization
+- `RateLimitingFilter` as Spring Security filter chain component
+- `.env.example` added for environment variable reference
+
 ## [1.1.0] - 2026-03-13
 
 ### Added
@@ -76,7 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v1.2.0
-- Email verification
-- Rate limiting
-- Redis caching
+### Planned for v1.3.0
+- User profile management
+- Audit logging
+- Two-factor authentication (2FA)
