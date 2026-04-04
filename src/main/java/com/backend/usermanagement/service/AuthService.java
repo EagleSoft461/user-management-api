@@ -1,5 +1,6 @@
 package com.backend.usermanagement.service;
 
+import com.backend.usermanagement.domain.entity.AuditAction;
 import com.backend.usermanagement.domain.entity.PasswordResetToken;
 import com.backend.usermanagement.domain.entity.RefreshToken;
 import com.backend.usermanagement.domain.entity.User;
@@ -7,6 +8,7 @@ import com.backend.usermanagement.dto.response.AuthResponse;
 import com.backend.usermanagement.repository.PasswordResetTokenRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import com.backend.usermanagement.security.JwtUtil;
+import com.backend.usermanagement.service.AuditLogService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,14 +28,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final AuditLogService auditLogService;
 
-    public AuthService(AuthenticationManager authenticationManager, 
-                      JwtUtil jwtUtil, 
+    public AuthService(AuthenticationManager authenticationManager,
+                      JwtUtil jwtUtil,
                       UserService userService,
                       PasswordResetTokenRepository passwordResetTokenRepository,
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder,
-                      RefreshTokenService refreshTokenService) {
+                      RefreshTokenService refreshTokenService,
+                      AuditLogService auditLogService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
@@ -41,13 +45,20 @@ public class AuthService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
     public AuthResponse login(String email, String password) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+        } catch (Exception e) {
+            auditLogService.log(email, AuditAction.LOGIN,
+                    false, "unknown", "Login failed: " + e.getMessage());
+            throw new IllegalArgumentException("Invalid email or password");
+        }
 
         User user = userService.findByEmail(email);
         
@@ -56,6 +67,8 @@ public class AuthService {
         
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        auditLogService.log(email, AuditAction.LOGIN, true, "unknown", "Login successful");
 
         return new AuthResponse(user.getId(), accessToken, refreshToken.getToken(), email, "Login successful");
     }
