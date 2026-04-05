@@ -7,6 +7,7 @@ public class AuthResponse {
     private String refreshToken;
     private String email;
     private String message;
+    private boolean twoFactorRequired = false;
 
     public AuthResponse() {
     }
@@ -80,5 +81,13 @@ public class AuthResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isTwoFactorRequired() {
+        return twoFactorRequired;
+    }
+
+    public void setTwoFactorRequired(boolean twoFactorRequired) {
+        this.twoFactorRequired = twoFactorRequired;
     }
 }

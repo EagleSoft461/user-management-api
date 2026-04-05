@@ -22,6 +22,13 @@ public class User {
     @Column(name = "is_active")
     private boolean active = true;
 
+    // 2FA alanları
+    @Column(name = "two_factor_enabled")
+    private boolean twoFactorEnabled = false;
+
+    @Column(name = "two_factor_secret")
+    private String twoFactorSecret;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -71,6 +78,24 @@ public class User {
 
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public boolean isTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public String getTwoFactorSecret() {
+        return twoFactorSecret;
+    }
+
+    public void enableTwoFactor(String secret) {
+        this.twoFactorSecret = secret;
+        this.twoFactorEnabled = true;
+    }
+
+    public void disableTwoFactor() {
+        this.twoFactorSecret = null;
+        this.twoFactorEnabled = false;
     }
 
     public Set<Role> getRoles() {
