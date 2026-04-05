@@ -5,14 +5,20 @@ import com.backend.usermanagement.dto.request.LoginRequest;
 import com.backend.usermanagement.dto.request.RefreshTokenRequest;
 import com.backend.usermanagement.dto.request.RegisterRequest;
 import com.backend.usermanagement.dto.request.ResetPasswordRequest;
+import com.backend.usermanagement.dto.request.TwoFactorLoginRequest;
+import com.backend.usermanagement.dto.request.TwoFactorVerifyRequest;
 import com.backend.usermanagement.dto.response.AuthResponse;
 import com.backend.usermanagement.dto.response.PasswordResetResponse;
+import com.backend.usermanagement.dto.response.TwoFactorSetupResponse;
 import com.backend.usermanagement.service.AuthService;
+import dev.samstevens.totp.exceptions.QrGenerationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -63,5 +69,43 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         AuthResponse response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
+    }
+
+    // 2FA Setup: QR code ve secret döndür (JWT gerekli)
+    @PostMapping("/2fa/setup")
+    @Operation(summary = "Setup 2FA", description = "Generates QR code for Google Authenticator")
+    public ResponseEntity<TwoFactorSetupResponse> setupTwoFactor(
+            @AuthenticationPrincipal UserDetails userDetails) throws QrGenerationException {
+        TwoFactorSetupResponse response = authService.setupTwoFactor(userDetails.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
+    // 2FA Verify: QR tarandıktan sonra kodu doğrula ve 2FA'yı aktif et
+    @PostMapping("/2fa/verify")
+    @Operation(summary = "Verify and enable 2FA", description = "Verifies TOTP code and enables 2FA")
+    public ResponseEntity<String> verifyTwoFactor(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody TwoFactorVerifyRequest request) {
+        authService.verifyTwoFactor(userDetails.getUsername(), request.getCode());
+        return ResponseEntity.ok("2FA enabled successfully");
+    }
+
+    // 2FA Login: Email/şifre sonrası kod ile token al
+    @PostMapping("/2fa/validate")
+    @Operation(summary = "Validate 2FA code", description = "Validates TOTP code and returns JWT token")
+    public ResponseEntity<AuthResponse> validateTwoFactor(
+            @Valid @RequestBody TwoFactorLoginRequest request) {
+        AuthResponse response = authService.validateTwoFactorLogin(request.getEmail(), request.getCode());
+        return ResponseEntity.ok(response);
+    }
+
+    // 2FA Disable: Kodu doğrulayarak 2FA'yı kapat
+    @PostMapping("/2fa/disable")
+    @Operation(summary = "Disable 2FA", description = "Disables 2FA after verifying current code")
+    public ResponseEntity<String> disableTwoFactor(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody TwoFactorVerifyRequest request) {
+        authService.disableTwoFactor(userDetails.getUsername(), request.getCode());
+        return ResponseEntity.ok("2FA disabled successfully");
     }
 }

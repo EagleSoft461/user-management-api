@@ -5,10 +5,12 @@ import com.backend.usermanagement.domain.entity.PasswordResetToken;
 import com.backend.usermanagement.domain.entity.RefreshToken;
 import com.backend.usermanagement.domain.entity.User;
 import com.backend.usermanagement.dto.response.AuthResponse;
+import com.backend.usermanagement.dto.response.TwoFactorSetupResponse;
 import com.backend.usermanagement.repository.PasswordResetTokenRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import com.backend.usermanagement.security.JwtUtil;
 import com.backend.usermanagement.service.AuditLogService;
+import dev.samstevens.totp.exceptions.QrGenerationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final AuditLogService auditLogService;
+    private final TwoFactorService twoFactorService;
 
     public AuthService(AuthenticationManager authenticationManager,
                       JwtUtil jwtUtil,
@@ -37,7 +40,8 @@ public class AuthService {
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder,
                       RefreshTokenService refreshTokenService,
-                      AuditLogService auditLogService) {
+                      AuditLogService auditLogService,
+                      TwoFactorService twoFactorService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
@@ -46,6 +50,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.auditLogService = auditLogService;
+        this.twoFactorService = twoFactorService;
     }
 
     @Transactional
@@ -61,7 +66,14 @@ public class AuthService {
         }
 
         User user = userService.findByEmail(email);
-        
+
+        // 2FA aktifse token vermeden önce kod iste
+        if (user.isTwoFactorEnabled()) {
+            AuthResponse response = new AuthResponse(null, null, null, email, "2FA code required");
+            response.setTwoFactorRequired(true);
+            return response;
+        }
+
         // Generate access token
         String accessToken = jwtUtil.generateToken(email);
         
@@ -131,6 +143,54 @@ public class AuthService {
         return token;
     }
     
+    // 2FA Setup: Secret üret ve QR code döndür
+    @Transactional
+    public TwoFactorSetupResponse setupTwoFactor(String email) throws QrGenerationException {
+        User user = userService.findByEmail(email);
+        String secret = twoFactorService.generateSecret();
+        user.enableTwoFactor(secret);
+        userRepository.save(user);
+        String qrCodeUri = twoFactorService.generateQrCodeDataUri(email, secret);
+        return new TwoFactorSetupResponse(secret, qrCodeUri);
+    }
+
+    // 2FA Verify: Kodu doğrula ve 2FA'yı aktif et
+    @Transactional
+    public void verifyTwoFactor(String email, String code) {
+        User user = userService.findByEmail(email);
+        if (!twoFactorService.verifyCode(user.getTwoFactorSecret(), code)) {
+            throw new IllegalArgumentException("Invalid 2FA code");
+        }
+    }
+
+    // 2FA Login: Email/şifre doğrulandıktan sonra kod ile token al
+    @Transactional
+    public AuthResponse validateTwoFactorLogin(String email, String code) {
+        User user = userService.findByEmail(email);
+        if (!user.isTwoFactorEnabled()) {
+            throw new IllegalArgumentException("2FA is not enabled for this user");
+        }
+        if (!twoFactorService.verifyCode(user.getTwoFactorSecret(), code)) {
+            auditLogService.log(email, AuditAction.LOGIN, false, "unknown", "2FA code invalid");
+            throw new IllegalArgumentException("Invalid 2FA code");
+        }
+        String accessToken = jwtUtil.generateToken(email);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        auditLogService.log(email, AuditAction.LOGIN, true, "unknown", "Login with 2FA successful");
+        return new AuthResponse(user.getId(), accessToken, refreshToken.getToken(), email, "Login successful");
+    }
+
+    // 2FA Disable
+    @Transactional
+    public void disableTwoFactor(String email, String code) {
+        User user = userService.findByEmail(email);
+        if (!twoFactorService.verifyCode(user.getTwoFactorSecret(), code)) {
+            throw new IllegalArgumentException("Invalid 2FA code");
+        }
+        user.disableTwoFactor();
+        userRepository.save(user);
+    }
+
     @Transactional
     public void resetPassword(String token, String newPassword, String confirmPassword) {
         // Validate passwords match

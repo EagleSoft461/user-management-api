@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-04-04
+
+### Added
+- Two-Factor Authentication (TOTP) using Google Authenticator
+- `POST /auth/2fa/setup` — generates secret key and QR code
+- `POST /auth/2fa/verify` — verifies TOTP code and enables 2FA
+- `POST /auth/2fa/validate` — validates code during login and returns JWT
+- `POST /auth/2fa/disable` — disables 2FA after code verification
+- Login flow updated: returns `twoFactorRequired: true` when 2FA is enabled
+- `twoFactorEnabled` and `twoFactorSecret` fields added to User entity
+- `TwoFactorService` with secret generation, QR code creation, code verification
+- `dev.samstevens.totp` library for TOTP implementation
+
+### Security
+- Time-based one-time passwords (30-second window)
+- SHA1 hashing algorithm, 6-digit codes
+- 2FA codes verified before issuing JWT tokens
+
 ## [1.3.0] - 2026-03-28
 
 ### Added
