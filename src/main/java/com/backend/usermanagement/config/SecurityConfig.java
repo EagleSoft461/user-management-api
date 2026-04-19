@@ -1,6 +1,8 @@
 package com.backend.usermanagement.config;
 
 import com.backend.usermanagement.security.JwtAuthenticationFilter;
+import com.backend.usermanagement.security.RestAccessDeniedHandler;
+import com.backend.usermanagement.security.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,10 +27,17 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
+                          UserDetailsService userDetailsService,
+                          RestAuthenticationEntryPoint authenticationEntryPoint,
+                          RestAccessDeniedHandler accessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -37,18 +46,34 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/auth/register",
+                                "/auth/login",
+                                "/auth/verify-email",
+                                "/auth/resend-verification",
+                                "/auth/forgot-password",
+                                "/auth/reset-password",
+                                "/auth/refresh",
+                                "/auth/2fa/validate",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
+                        .requestMatchers(
+                                "/auth/2fa/setup",
+                                "/auth/2fa/verify",
+                                "/auth/2fa/disable"
+                        ).authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

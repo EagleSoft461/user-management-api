@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-04-19
+
+### Added
+- Pagination and filtering for user listing
+- `GET /api/users/paged` endpoint with query parameters:
+  - `page`, `size` — pagination control
+  - `sortBy`, `sortDir` — sorting (any field, asc/desc)
+  - `active` — filter by active status
+  - `email` — search by email (LIKE)
+  - `role` — filter by role name
+- `PagedResponse<T>` generic wrapper with metadata (totalPages, totalElements, currentPage, first, last)
+- `emailVerified` field added to `UserResponse`
+- Custom JPQL query with JOIN FETCH to avoid N+1 lazy loading
+
+### Technical
+- `UserRepository` extended with pagination query methods
+- `@Transactional(readOnly = true)` for read-only pagination queries
+- Spring Data JPA `Pageable` and `Page<T>` usage
+
 ## [1.4.0] - 2026-04-04
 
 ### Added

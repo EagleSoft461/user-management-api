@@ -11,16 +11,18 @@ public class UserResponse implements Serializable {
     private Long id;
     private String email;
     private boolean active;
+    private boolean emailVerified;
     private LocalDateTime createdAt;
     private Set<String> roles;
 
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String email, boolean active, LocalDateTime createdAt, Set<String> roles) {
+    public UserResponse(Long id, String email, boolean active, boolean emailVerified, LocalDateTime createdAt, Set<String> roles) {
         this.id = id;
         this.email = email;
         this.active = active;
+        this.emailVerified = emailVerified;
         this.createdAt = createdAt;
         this.roles = roles;
     }
@@ -47,6 +49,14 @@ public class UserResponse implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public LocalDateTime getCreatedAt() {

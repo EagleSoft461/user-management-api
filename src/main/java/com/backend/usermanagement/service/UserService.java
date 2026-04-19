@@ -2,13 +2,19 @@ package com.backend.usermanagement.service;
 
 import com.backend.usermanagement.domain.entity.Role;
 import com.backend.usermanagement.domain.entity.User;
+import com.backend.usermanagement.dto.response.PagedResponse;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.repository.RoleRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +60,35 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    // Pagination + Filtering
+    @Transactional(readOnly = true)
+    public PagedResponse<UserResponse> getUsersPaged(
+            int page, int size, String sortBy, String sortDir,
+            Boolean active, String email, String role) {
+
+        // Sıralama yönü
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<User> users;
+
+        // Filtre kombinasyonlarına göre doğru repository metodunu çağır
+        if (role != null && !role.isEmpty()) {
+            users = userRepository.findByRoleName(role, pageable);
+        } else if (active != null && email != null && !email.isEmpty()) {
+            users = userRepository.findByActiveAndEmailContainingIgnoreCase(active, email, pageable);
+        } else if (active != null) {
+            users = userRepository.findByActive(active, pageable);
+        } else if (email != null && !email.isEmpty()) {
+            users = userRepository.findByEmailContainingIgnoreCase(email, pageable);
+        } else {
+            users = userRepository.findAllWithRolesPaged(pageable);
+        }
+
+        return new PagedResponse<>(users.map(this::convertToResponse));
+    }
     @Cacheable(value = "users", key = "#id")  // Cache key: "users::1", "users::2", ...
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
@@ -114,6 +149,7 @@ public class UserService {
                 user.getId(),
                 user.getEmail(),
                 user.isActive(),
+                user.isEmailVerified(),
                 user.getCreatedAt(),
                 user.getRoles().stream()
                         .map(Role::getName)

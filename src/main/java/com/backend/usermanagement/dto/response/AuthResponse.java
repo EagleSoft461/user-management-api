@@ -90,4 +90,5 @@ public class AuthResponse {
     public void setTwoFactorRequired(boolean twoFactorRequired) {
         this.twoFactorRequired = twoFactorRequired;
     }
+
 }
