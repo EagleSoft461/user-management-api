@@ -1,4 +1,4 @@
-# User Management System - Backend API
+﻿# User Management System - Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -7,7 +7,7 @@
 
 A modern and secure user management system REST API built with Spring Boot 3, Spring Security, JWT authentication, and PostgreSQL.
 
-## 📸 Screenshots
+## ğŸ“¸ Screenshots
 
 ### Swagger UI
 ![Swagger UI](docs/images/swagger-ui.png)
@@ -43,7 +43,7 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 ![Deactivate Account](docs/images/deactivate-account-response.png)
 *User deactivating their own account*
 
-## 🚀 Technologies
+## ğŸš€ Technologies
 
 - **Java 17** - LTS version
 - **Spring Boot 3.3.7** - Latest stable version
@@ -56,50 +56,50 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - **JUnit 5 & Mockito** - Testing
 - **BCrypt** - Password encryption
 
-## 📋 Features
+## ğŸ“‹ Features
 
 ### v1.0.0 (Released)
-- ✅ JWT-based authentication
-- ✅ BCrypt password encryption
-- ✅ Role-based access control (USER, ADMIN)
-- ✅ RESTful API endpoints
-- ✅ Global exception handling
-- ✅ Input validation
-- ✅ Swagger UI documentation
-- ✅ Unit & Integration tests
-- ✅ Docker support
+- âœ… JWT-based authentication
+- âœ… BCrypt password encryption
+- âœ… Role-based access control (USER, ADMIN)
+- âœ… RESTful API endpoints
+- âœ… Global exception handling
+- âœ… Input validation
+- âœ… Swagger UI documentation
+- âœ… Unit & Integration tests
+- âœ… Docker support
 
 ### v1.1.0 (Released)
-- ✅ Change password functionality
-- ✅ Account deactivation (soft delete)
-- ✅ Password reset with token
-- ✅ Refresh token mechanism with rotation
+- âœ… Change password functionality
+- âœ… Account deactivation (soft delete)
+- âœ… Password reset with token
+- âœ… Refresh token mechanism with rotation
 
 ### v1.2.0 (Planned)
-- 🚧 Email verification
-- 🚧 Rate limiting
-- 🚧 Redis caching
+- ğŸš§ Email verification
+- ğŸš§ Rate limiting
+- ğŸš§ Redis caching
 
-## 🏗️ Architecture
+## ğŸ—ï¸ Architecture
 
 ```
 src/
-├── main/
-│   ├── java/com/backend/usermanagement/
-│   │   ├── config/          # Configuration classes
-│   │   ├── controller/      # REST Controllers
-│   │   ├── domain/entity/   # JPA Entities
-│   │   ├── dto/             # Data Transfer Objects
-│   │   ├── exception/       # Exception handling
-│   │   ├── repository/      # JPA Repositories
-│   │   ├── security/        # Security & JWT
-│   │   └── service/         # Business logic
-│   └── resources/
-│       └── application.properties
-└── test/                    # Test classes
+â”œâ”€â”€ main/
+â”‚   â”œâ”€â”€ java/com/backend/usermanagement/
+â”‚   â”‚   â”œâ”€â”€ config/          # Configuration classes
+â”‚   â”‚   â”œâ”€â”€ controller/      # REST Controllers
+â”‚   â”‚   â”œâ”€â”€ domain/entity/   # JPA Entities
+â”‚   â”‚   â”œâ”€â”€ dto/             # Data Transfer Objects
+â”‚   â”‚   â”œâ”€â”€ exception/       # Exception handling
+â”‚   â”‚   â”œâ”€â”€ repository/      # JPA Repositories
+â”‚   â”‚   â”œâ”€â”€ security/        # Security & JWT
+â”‚   â”‚   â””â”€â”€ service/         # Business logic
+â”‚   â””â”€â”€ resources/
+â”‚       â””â”€â”€ application.properties
+â””â”€â”€ test/                    # Test classes
 ```
 
-## 🔧 Installation
+## ğŸ”§ Installation
 
 ### Prerequisites
 
@@ -128,36 +128,36 @@ docker-compose up -d
 
 The application will start at `http://localhost:8081`
 
-## 📚 API Endpoints
+## ğŸ“š API Endpoints
 
 ### Authentication
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | ❌ |
-| POST | `/auth/login` | User login | ❌ |
-| POST | `/auth/refresh` | Refresh access token | ❌ |
-| POST | `/auth/forgot-password` | Request password reset | ❌ |
-| POST | `/auth/reset-password` | Reset password with token | ❌ |
+| POST | `/auth/register` | Register new user | âŒ |
+| POST | `/auth/login` | User login | âŒ |
+| POST | `/auth/refresh` | Refresh access token | âŒ |
+| POST | `/auth/forgot-password` | Request password reset | âŒ |
+| POST | `/auth/reset-password` | Reset password with token | âŒ |
 
 ### User Management
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/users` | List all users | ✅ ADMIN |
-| GET | `/api/users/{id}` | Get user details | ✅ ADMIN |
-| DELETE | `/api/users/{id}` | Deactivate user | ✅ ADMIN |
-| PUT | `/api/users/{id}/roles/{roleName}` | Add role to user | ✅ ADMIN |
-| POST | `/api/users/change-password` | Change password | ✅ USER |
-| POST | `/api/users/deactivate` | Deactivate own account | ✅ USER |
+| GET | `/api/users` | List all users | âœ… ADMIN |
+| GET | `/api/users/{id}` | Get user details | âœ… ADMIN |
+| DELETE | `/api/users/{id}` | Deactivate user | âœ… ADMIN |
+| PUT | `/api/users/{id}/roles/{roleName}` | Add role to user | âœ… ADMIN |
+| POST | `/api/users/change-password` | Change password | âœ… USER |
+| POST | `/api/users/deactivate` | Deactivate own account | âœ… USER |
 
-## 📖 API Documentation
+## ğŸ“– API Documentation
 
 Swagger UI: `http://localhost:8081/swagger-ui.html`
 
 OpenAPI Docs: `http://localhost:8081/v3/api-docs`
 
-## 🔐 Authentication Flow
+## ğŸ” Authentication Flow
 
 1. **Register**: Send email and password to `/auth/register`
 2. **Login**: Send credentials to `/auth/login`
@@ -167,7 +167,7 @@ OpenAPI Docs: `http://localhost:8081/v3/api-docs`
    Authorization: Bearer <your-jwt-token>
    ```
 
-## 📝 Example Requests
+## ğŸ“ Example Requests
 
 ### Register
 
@@ -254,7 +254,7 @@ curl -X POST http://localhost:8081/auth/refresh \
   }'
 ```
 
-## 🧪 Testing
+## ğŸ§ª Testing
 
 ```bash
 # Run all tests
@@ -264,7 +264,7 @@ curl -X POST http://localhost:8081/auth/refresh \
 ./mvnw test -Dtest=UserServiceTest
 ```
 
-## 🗄️ Database Schema
+## ğŸ—„ï¸ Database Schema
 
 ### Users Table
 - id (PK)
@@ -281,7 +281,7 @@ curl -X POST http://localhost:8081/auth/refresh \
 - user_id (FK)
 - role_id (FK)
 
-## 🔒 Security
+## ğŸ”’ Security
 
 - Passwords are hashed with BCrypt
 - JWT tokens are valid for 24 hours
@@ -289,7 +289,7 @@ curl -X POST http://localhost:8081/auth/refresh \
 - Role-based authorization
 - Input validation
 
-## 🐳 Docker
+## ğŸ³ Docker
 
 ```bash
 # Start PostgreSQL
@@ -302,7 +302,7 @@ docker-compose down
 docker-compose down -v
 ```
 
-## 📦 Build
+## ğŸ“¦ Build
 
 ```bash
 # Create JAR file
@@ -312,7 +312,7 @@ docker-compose down -v
 java -jar target/usermanagement-0.0.1-SNAPSHOT.jar
 ```
 
-## 🚀 Deployment
+## ğŸš€ Deployment
 
 ### Environment Variables
 
@@ -327,7 +327,7 @@ JWT_SECRET=your-secret-key
 JWT_EXPIRATION=86400000
 ```
 
-## 🤝 Contributing
+## ğŸ¤ Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -335,51 +335,45 @@ JWT_EXPIRATION=86400000
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## � Roadmap
 
-- [ ] Refresh token mechanism
-- [ ] Email verification
-- [ ] Password reset functionality
-- [ ] Rate limiting
-- [ ] Redis caching
+## 🗺️ Roadmap
+
+- [x] JWT authentication
+- [x] Role-based access control
+- [x] Change password & account deactivation
+- [x] Password reset & refresh token
+- [x] Email verification
+- [x] Rate limiting
+- [x] Redis caching
+- [x] Audit logging
+- [x] Two-Factor Authentication (2FA)
+- [x] Pagination & Filtering
 - [ ] User profile management
-- [ ] Audit logging
-- [ ] Two-factor authentication (2FA)
-
-## 📝 Roadmap
-
-See our detailed [ROADMAP.md](ROADMAP.md) for planned features and timeline.
-
-### Next Release: v1.1.0
-- Refresh token mechanism
-- Email verification  
-- Password reset functionality
-- Account management
-
-[View Full Roadmap →](ROADMAP.md)
-
-## 📄 License
+- [ ] API versioning
+## ğŸ“„ License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👤 Author
+## ğŸ‘¤ Author
 
 **EagleSoft461**
 - GitHub: [@Ali Orhan-Cy979](https://github.com/EagleSoft461)
-- LinkedIn: [ALİ ORHAN OK](https://www.linkedin.com/in/ali-orhan-ok-309a2a38a/)
+- LinkedIn: [ALÄ° ORHAN OK](https://www.linkedin.com/in/ali-orhan-ok-309a2a38a/)
 - Email: aliorhanok78@gmail.com
 
-## 🙏 Acknowledgments
+## ğŸ™ Acknowledgments
 
 - Spring Boot Team
 - Spring Security Team
 - JWT.io
 - PostgreSQL Community
 
-## 📞 Support
+## ğŸ“ Support
 
 For support, email aliorhanok78@gmail.com or open an issue in the repository.
 
 ---
 
-⭐ If you find this project useful, please consider giving it a star!
+â­ If you find this project useful, please consider giving it a star!
+
+

@@ -2,6 +2,7 @@ package com.backend.usermanagement.controller;
 
 import com.backend.usermanagement.dto.request.ChangePasswordRequest;
 import com.backend.usermanagement.dto.request.DeactivateAccountRequest;
+import com.backend.usermanagement.dto.response.PagedResponse;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,23 @@ public class UserController {
     @Operation(summary = "Get all users", description = "Retrieve all users (Admin only)")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    // Paginated + Filtered endpoint
+    // Örnek: GET /api/users/paged?page=0&size=10&sortBy=createdAt&sortDir=desc&active=true&email=test
+    @GetMapping("/paged")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get users with pagination and filtering",
+               description = "Retrieve users with pagination, sorting and filtering (Admin only)")
+    public ResponseEntity<PagedResponse<UserResponse>> getUsersPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String role) {
+        return ResponseEntity.ok(userService.getUsersPaged(page, size, sortBy, sortDir, active, email, role));
     }
 
     @GetMapping("/{id}")

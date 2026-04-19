@@ -22,6 +22,9 @@ public class User {
     @Column(name = "is_active")
     private boolean active = true;
 
+    @Column(name = "email_verified")
+    private boolean emailVerified = true;
+
     // 2FA alanları
     @Column(name = "two_factor_enabled")
     private boolean twoFactorEnabled = false;
@@ -74,6 +77,18 @@ public class User {
 
     public void deactivate() {
         this.active = false;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void markEmailVerified() {
+        this.emailVerified = true;
+    }
+
+    public void markEmailUnverified() {
+        this.emailVerified = false;
     }
 
     public void changePassword(String encodedPassword) {

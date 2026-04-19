@@ -1,19 +1,19 @@
 package com.backend.usermanagement.service;
 
 import com.backend.usermanagement.domain.entity.AuditAction;
+import com.backend.usermanagement.domain.entity.EmailVerificationToken;
 import com.backend.usermanagement.domain.entity.PasswordResetToken;
 import com.backend.usermanagement.domain.entity.RefreshToken;
 import com.backend.usermanagement.domain.entity.User;
 import com.backend.usermanagement.dto.response.AuthResponse;
 import com.backend.usermanagement.dto.response.TwoFactorSetupResponse;
+import com.backend.usermanagement.repository.EmailVerificationTokenRepository;
 import com.backend.usermanagement.repository.PasswordResetTokenRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import com.backend.usermanagement.security.JwtUtil;
-import com.backend.usermanagement.service.AuditLogService;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,31 +26,37 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final AuditLogService auditLogService;
     private final TwoFactorService twoFactorService;
+    private final EmailService emailService;
 
     public AuthService(AuthenticationManager authenticationManager,
                       JwtUtil jwtUtil,
                       UserService userService,
+                      EmailVerificationTokenRepository emailVerificationTokenRepository,
                       PasswordResetTokenRepository passwordResetTokenRepository,
                       UserRepository userRepository,
                       PasswordEncoder passwordEncoder,
                       RefreshTokenService refreshTokenService,
                       AuditLogService auditLogService,
-                      TwoFactorService twoFactorService) {
+                      TwoFactorService twoFactorService,
+                      EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.auditLogService = auditLogService;
         this.twoFactorService = twoFactorService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -66,6 +72,10 @@ public class AuthService {
         }
 
         User user = userService.findByEmail(email);
+
+        if (!user.isEmailVerified()) {
+            throw new IllegalArgumentException("Email is not verified. Please verify your email before logging in.");
+        }
 
         // 2FA aktifse token vermeden önce kod iste
         if (user.isTwoFactorEnabled()) {
@@ -88,6 +98,11 @@ public class AuthService {
     @Transactional
     public AuthResponse register(String email, String password) {
         User user = userService.registerUser(email, password);
+        user.markEmailUnverified();
+        userRepository.save(user);
+
+        String verificationToken = createEmailVerificationToken(user);
+        emailService.sendVerificationEmail(user.getEmail(), verificationToken);
         
         // Generate access token
         String accessToken = jwtUtil.generateToken(email);
@@ -95,7 +110,40 @@ public class AuthService {
         // Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return new AuthResponse(user.getId(), accessToken, refreshToken.getToken(), email, "Registration successful");
+        AuthResponse response = new AuthResponse(
+                user.getId(),
+                accessToken,
+                refreshToken.getToken(),
+                email,
+                "Registration successful. Please verify your email."
+        );
+        return response;
+    }
+
+    @Transactional
+    public void resendVerificationToken(String email) {
+        User user = userService.findByEmail(email);
+        if (user.isEmailVerified()) {
+            throw new IllegalArgumentException("Email is already verified");
+        }
+        String verificationToken = createEmailVerificationToken(user);
+        emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+    }
+
+    @Transactional
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
+
+        if (verificationToken.isExpired()) {
+            emailVerificationTokenRepository.delete(verificationToken);
+            throw new IllegalArgumentException("Verification token has expired");
+        }
+
+        User user = verificationToken.getUser();
+        user.markEmailVerified();
+        userRepository.save(user);
+        emailVerificationTokenRepository.delete(verificationToken);
     }
 
     @Transactional
@@ -136,10 +184,17 @@ public class AuthService {
         // Save token
         PasswordResetToken resetToken = new PasswordResetToken(token, user, expiryDate);
         passwordResetTokenRepository.save(resetToken);
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
         
-        // In production, send email here
-        // emailService.sendPasswordResetEmail(user.getEmail(), token);
-        
+        return token;
+    }
+
+    private String createEmailVerificationToken(User user) {
+        emailVerificationTokenRepository.deleteByUser(user);
+        String token = java.util.UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusHours(24);
+        EmailVerificationToken verificationToken = new EmailVerificationToken(token, user, expiryDate);
+        emailVerificationTokenRepository.save(verificationToken);
         return token;
     }
     
