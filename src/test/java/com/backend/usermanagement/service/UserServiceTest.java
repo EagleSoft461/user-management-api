@@ -2,6 +2,8 @@ package com.backend.usermanagement.service;
 
 import com.backend.usermanagement.domain.entity.Role;
 import com.backend.usermanagement.domain.entity.User;
+import com.backend.usermanagement.dto.response.PagedResponse;
+import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.repository.RoleRepository;
 import com.backend.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,13 +12,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -246,5 +254,79 @@ class UserServiceTest {
 
         assertEquals("Incorrect password", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    // ==================== Pagination Tests ====================
+
+    @Test
+    void getUsersPaged_NoFilter_ReturnsPagedResponse() {
+        User user1 = new User("[email1]", "pass1");
+        User user2 = new User("[email2]", "pass2");
+        List<User> users = List.of(user1, user2);
+        Page<User> page = new PageImpl<>(users, PageRequest.of(0, 10), 2);
+
+        when(userRepository.findAllWithRolesPaged(any(Pageable.class))).thenReturn(page);
+
+        PagedResponse<UserResponse> result = userService.getUsersPaged(0, 10, "id", "asc", null, null, null);
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(0, result.getCurrentPage());
+        assertEquals(1, result.getTotalPages());
+        assertTrue(result.isFirst());
+        assertTrue(result.isLast());
+    }
+
+    @Test
+    void getUsersPaged_WithActiveFilter_ReturnsFilteredPage() {
+        User activeUser = new User("[email]", "pass");
+        Page<User> page = new PageImpl<>(List.of(activeUser), PageRequest.of(0, 10), 1);
+
+        when(userRepository.findByActive(eq(true), any(Pageable.class))).thenReturn(page);
+
+        PagedResponse<UserResponse> result = userService.getUsersPaged(0, 10, "id", "asc", true, null, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository).findByActive(eq(true), any(Pageable.class));
+    }
+
+    @Test
+    void getUsersPaged_WithEmailFilter_ReturnsFilteredPage() {
+        User user = new User("test@example.com", "pass");
+        Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 10), 1);
+
+        when(userRepository.findByEmailContainingIgnoreCase(eq("test"), any(Pageable.class))).thenReturn(page);
+
+        PagedResponse<UserResponse> result = userService.getUsersPaged(0, 10, "id", "asc", null, "test", null);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository).findByEmailContainingIgnoreCase(eq("test"), any(Pageable.class));
+    }
+
+    @Test
+    void getUsersPaged_WithRoleFilter_ReturnsFilteredPage() {
+        User adminUser = new User("[email]", "pass");
+        Page<User> page = new PageImpl<>(List.of(adminUser), PageRequest.of(0, 10), 1);
+
+        when(userRepository.findByRoleName(eq("ADMIN"), any(Pageable.class))).thenReturn(page);
+
+        PagedResponse<UserResponse> result = userService.getUsersPaged(0, 10, "id", "asc", null, null, "ADMIN");
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository).findByRoleName(eq("ADMIN"), any(Pageable.class));
+    }
+
+    @Test
+    void getUsersPaged_DescendingSort_CallsRepositoryWithCorrectSort() {
+        Page<User> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        when(userRepository.findAllWithRolesPaged(any(Pageable.class))).thenReturn(page);
+
+        PagedResponse<UserResponse> result = userService.getUsersPaged(0, 10, "createdAt", "desc", null, null, null);
+
+        assertNotNull(result);
+        verify(userRepository).findAllWithRolesPaged(any(Pageable.class));
     }
 }

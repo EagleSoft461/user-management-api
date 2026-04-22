@@ -2,365 +2,131 @@
 
 This document outlines the planned features and improvements for the User Management API.
 
-## Current Version: v1.1.0 ✅
-
-### Completed Features
-- ✅ JWT-based authentication
-- ✅ User registration and login
-- ✅ Spring Security integration
-- ✅ BCrypt password encryption
-- ✅ Role-based access control (USER, ADMIN)
-- ✅ Global exception handling
-- ✅ Input validation
-- ✅ Swagger/OpenAPI documentation
-- ✅ PostgreSQL database integration
-- ✅ Docker Compose setup
-- ✅ Unit & Integration tests
-- ✅ Change password functionality
-- ✅ Account deactivation (soft delete)
-- ✅ Password reset with tokens
-- ✅ Refresh token mechanism
+## Current Version: v1.5.0 ✅
 
 ---
 
-## v1.1.0 - Authentication Enhancement 🔐
-**Target: March 2026**
-**Priority: High**
-**Status: Completed** ✅
+## ✅ v1.0.0 - Foundation
+**Status: Completed**
 
-### Features
-- [x] Refresh Token mechanism
-  - ✅ Generate refresh tokens on login (7-day validity)
-  - ✅ Refresh access token endpoint
-  - ✅ Token rotation strategy
-  - ✅ Revoke refresh tokens
-
-- [ ] Email Verification
-  - Send verification email on registration
-  - Email verification token
-  - Resend verification email endpoint
-  - Account activation flow
-
-- [x] Password Reset
-  - ✅ Forgot password endpoint
-  - ✅ Password reset token via email (15-minute expiry)
-  - ✅ Reset password with token
-  - ✅ Password reset confirmation
-
-- [x] Account Management
-  - ✅ Change password (authenticated users) - **Completed 2026-03-08**
-  - ✅ Account deactivation by user - **Completed 2026-03-13**
-  - [ ] Email change with verification
-
-### Learning Goals
-- ✅ Token expiration strategies
-- ✅ Token rotation and revocation
-- ✅ Transaction management
-- 🚧 JavaMailSender integration (deferred to v1.2.0)
-- 🚧 Email template design (deferred to v1.2.0)
-- 🚧 Asynchronous email sending (deferred to v1.2.0)
+- [x] JWT-based authentication
+- [x] User registration and login
+- [x] Spring Security integration
+- [x] BCrypt password encryption
+- [x] Role-based access control (USER, ADMIN)
+- [x] Global exception handling
+- [x] Input validation
+- [x] Swagger/OpenAPI documentation
+- [x] PostgreSQL database integration
+- [x] Docker Compose setup
+- [x] Unit & Integration tests
 
 ---
 
-## v1.2.0 - Email & Security Enhancement 📧
-**Target: April 2026**
-**Priority: High**
-**Status: Planned**
+## ✅ v1.1.0 - Authentication Enhancement
+**Status: Completed — March 2026**
 
-### Features
-- [ ] Email Verification
-  - Send verification email on registration
-  - Email verification token
-  - Resend verification email endpoint
-  - Account activation flow
-  - JavaMailSender integration
-  - Email templates
-
-- [ ] Rate Limiting
-- [ ] Rate Limiting
-  - Login attempt limiting
-  - API rate limiting per user
-  - IP-based rate limiting
-  - Bucket4j integration
-
-- [ ] Redis Caching
-  - Cache user data
-  - Cache JWT tokens
-  - Session management with Redis
-  - Cache invalidation strategies
-
-- [ ] Logging & Monitoring
-  - Structured logging (JSON format)
-  - Request/Response logging
-  - Authentication event logging
-  - Error tracking and alerting
-
-- [ ] Security Headers
-  - CORS configuration
-  - Content Security Policy
-  - X-Frame-Options
-  - Security headers middleware
-
-### Learning Goals
-- JavaMailSender integration
-- Email template design
-- Asynchronous email sending
-- Redis integration
-- Caching strategies
-- Rate limiting algorithms
+- [x] Refresh token mechanism with rotation (7-day validity)
+- [x] Password reset with time-limited tokens (15 minutes)
+- [x] Change password (authenticated users)
+- [x] Account deactivation (soft delete)
 
 ---
 
-## v1.3.0 - Security & Performance 🛡️
+## ✅ v1.2.0 - Email & Security
+**Status: Completed — March 2026**
+
+- [x] Email verification on registration (Gmail SMTP)
+- [x] Resend verification email endpoint
+- [x] IP-based rate limiting with Bucket4j
+  - Login: 5 req/min
+  - Register: 3 req/min
+  - General API: 30 req/min
+- [x] Redis caching with 5-minute TTL
+- [x] Docker Compose updated with Redis 7
+
+---
+
+## ✅ v1.3.0 - Audit Logging
+**Status: Completed — March 2026**
+
+- [x] Spring AOP-based audit logging
+- [x] Login success/failure tracking with IP address
+- [x] Admin audit log endpoints (all, failed, by user)
+- [x] REQUIRES_NEW transaction for log persistence
+
+---
+
+## ✅ v1.4.0 - Two-Factor Authentication
+**Status: Completed — April 2026**
+
+- [x] TOTP-based 2FA (Google Authenticator compatible)
+- [x] QR code generation for authenticator apps
+- [x] 2FA setup, verify, validate, disable endpoints
+- [x] Login flow updated with twoFactorRequired flag
+
+---
+
+## ✅ v1.5.0 - Pagination & Filtering
+**Status: Completed — April 2026**
+
+- [x] Paginated user listing (GET /api/users/paged)
+- [x] Filtering by active status, email (LIKE), role
+- [x] Sorting by any field (asc/desc)
+- [x] PagedResponse wrapper with metadata
+- [x] JOIN FETCH query to prevent N+1 lazy loading
+
+---
+
+## 🚧 v1.6.0 - User Profile Management
 **Target: May 2026**
-**Priority: High**
-**Status: Planned**
+**Priority: Medium**
 
-### Features
-- [ ] User Profile Management
-  - Get user profile
-  - Update profile information
-  - Profile completion percentage
-  - User preferences
-
-- [ ] File Upload
-  - Profile picture upload
-  - Image validation and processing
-  - File size limits
-  - AWS S3 or local storage
-
-- [ ] User Settings
-  - Notification preferences
-  - Privacy settings
-  - Language preferences
-  - Theme preferences
-
-- [ ] Password Strength
-  - Password strength meter
-  - Password history
-  - Password expiration policy
-  - Force password change
-
-### Learning Goals
-- Structured logging
-- Production monitoring
-- Security best practices
+- [ ] Add firstName, lastName, bio, phoneNumber fields to User
+- [ ] GET /api/users/me — view own profile
+- [ ] PUT /api/users/me — update own profile
+- [ ] Profile completion percentage
 
 ---
 
-## v1.4.0 - User Experience 👤
+## 🚧 v1.7.0 - API Versioning & Quality
 **Target: June 2026**
 **Priority: Medium**
-**Status: Planned**
 
-### Features
-- [ ] User Management
-  - Advanced user search
-  - Filter by role, status, date
-  - Pagination & sorting
-  - Export users to CSV/Excel
-
-- [ ] User Statistics
-  - Total users count
-  - Active/Inactive users
-  - Registration trends
-  - Login activity dashboard
-
-- [ ] Bulk Operations
-  - Bulk user activation/deactivation
-  - Bulk role assignment
-  - Bulk email sending
-  - Bulk user import
-
-- [ ] Audit Trail
-  - Track all user actions
-  - Admin action logging
-  - View audit logs
-  - Filter and search logs
-
-### Learning Goals
-- File upload handling
-- Image processing
-- AWS S3 integration
-- User preference management
+- [ ] API versioning (/api/v1, /api/v2)
+- [ ] Increase test coverage to 80%+
+- [ ] Add tests for pagination, 2FA, audit logging
+- [ ] Integration tests for all endpoints
+- [ ] CI/CD pipeline (GitHub Actions)
 
 ---
 
-## v1.5.0 - Admin Features 👨‍💼
-**Target: July 2026**
-**Priority: Medium**
-**Status: Planned**
-
-### Features
-- [ ] Two-Factor Authentication (2FA)
-  - TOTP (Time-based OTP)
-  - Google Authenticator integration
-  - Backup codes
-  - SMS OTP (optional)
-
-- [ ] OAuth2 Integration
-  - Login with Google
-  - Login with GitHub
-  - Login with Facebook
-  - Social account linking
-
-- [ ] API Versioning
-  - /api/v1 endpoints
-  - /api/v2 endpoints
-  - Version deprecation strategy
-  - Backward compatibility
-
-- [ ] WebSocket Support
-  - Real-time notifications
-  - Online user status
-  - Live updates
-  - Chat functionality (optional)
-
-- [ ] Advanced Audit Logging
-  - Detailed action tracking
-  - IP address logging
-  - Device information
-  - Geolocation tracking
-
-### Learning Goals
-- Advanced JPA queries
-- Pagination strategies
-- Data export functionality
-- Audit logging patterns
-
----
-
-## v2.0.0 - Major Update 🚀
-**Target: September 2026**
-**Priority: High**
-**Status: Planned**
-
-### Features
-- [ ] Multi-Tenancy
-  - Organization/Tenant management
-  - Tenant isolation
-  - Tenant-specific configurations
-  - Cross-tenant administration
-
-- [ ] Advanced Permissions
-  - Fine-grained permissions
-  - Permission groups
-  - Dynamic role creation
-  - Permission inheritance
-
-- [ ] Security Enhancements
-  - IP whitelisting/blacklisting
-  - Device fingerprinting
-  - Suspicious activity detection
-  - Account lockout policies
-
-- [ ] Session Management
-  - Active sessions list
-  - Remote session termination
-  - Session timeout configuration
-  - Concurrent session control
-
-### Learning Goals
-- OAuth2 protocol
-- Third-party API integration
-- WebSocket programming
-- API versioning strategies
-
----
-
-## v2.1.0 - Enterprise Features 🏢
-**Target: November 2026**
+## 🔮 v2.0.0 - Cloud & Microservices
+**Target: Q3 2026**
 **Priority: Low**
-**Status: Planned**
 
-### Features
-- [ ] Service Discovery
-  - Eureka Server integration
-  - Service registration
-  - Load balancing
-  - Health checks
-
-- [ ] API Gateway
-  - Centralized routing
-  - Authentication at gateway
-  - Rate limiting at gateway
-  - Request transformation
-
-- [ ] Config Server
-  - Centralized configuration
-  - Environment-specific configs
-  - Dynamic configuration updates
-  - Encryption support
-
-- [ ] Circuit Breaker
-  - Resilience4j integration
-  - Fallback mechanisms
-  - Retry policies
-  - Bulkhead pattern
-
-- [ ] Distributed Tracing
-  - Sleuth integration
-  - Zipkin/Jaeger
-  - Request correlation
-  - Performance monitoring
-
-### Learning Goals
-- Microservices architecture
-- Spring Cloud ecosystem
-- Distributed systems
-- Service mesh concepts
+- [ ] Deploy to cloud (Railway / AWS EC2)
+- [ ] OAuth2 integration (Google, GitHub)
+- [ ] Multi-tenancy support
+- [ ] API Gateway integration
+- [ ] Distributed tracing
 
 ---
 
-## Continuous Improvements 🔄
+## Continuous Improvements
 
 ### Code Quality
-- [ ] Increase test coverage to 90%+
-- [ ] Add integration tests for all endpoints
+- [ ] Increase test coverage to 80%+
 - [ ] Performance testing with JMeter
 - [ ] Security testing with OWASP ZAP
 
-### Documentation
-- [ ] API usage examples
-- [ ] Architecture diagrams
-- [ ] Deployment guides
-- [ ] Contributing guidelines
-
 ### DevOps
 - [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Automated testing
 - [ ] Docker multi-stage builds
-- [ ] Kubernetes deployment
-
-### Performance
-- [ ] Database query optimization
-- [ ] Connection pool tuning
-- [ ] Response time monitoring
-- [ ] Load testing
+- [ ] Kubernetes deployment config
 
 ---
 
-## How to Contribute
-
-If you'd like to contribute to any of these features:
-
-1. Check the [Issues](https://github.com/yourusername/repo/issues) page
-2. Comment on the feature you want to work on
-3. Fork the repository
-4. Create a feature branch
-5. Submit a Pull Request
-
----
-
-## Feedback
-
-Have suggestions for the roadmap? 
-- Open an [Issue](https://github.com/yourusername/repo/issues)
-- Start a [Discussion](https://github.com/yourusername/repo/discussions)
-- Contact: your.email@example.com
-
----
-
-**Last Updated:** March 13, 2026
-**Current Version:** v1.1.0
-**Next Release:** v1.2.0 (Target: April 2026)
+**Last Updated:** April 2026
+**Current Version:** v1.5.0
+**Next Release:** v1.6.0 - User Profile Management
