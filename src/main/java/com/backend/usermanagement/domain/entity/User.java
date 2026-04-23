@@ -25,6 +25,19 @@ public class User {
     @Column(name = "email_verified")
     private boolean emailVerified = true;
 
+    // Profile fields
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "bio", length = 500)
+    private String bio;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     // 2FA alanları
     @Column(name = "two_factor_enabled")
     private boolean twoFactorEnabled = false;
@@ -111,6 +124,25 @@ public class User {
     public void disableTwoFactor() {
         this.twoFactorSecret = null;
         this.twoFactorEnabled = false;
+    }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public void updateProfile(String firstName, String lastName, String bio, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.bio = bio;
+        this.phoneNumber = phoneNumber;
     }
 
     public Set<Role> getRoles() {

@@ -2,7 +2,9 @@ package com.backend.usermanagement.controller;
 
 import com.backend.usermanagement.dto.request.ChangePasswordRequest;
 import com.backend.usermanagement.dto.request.DeactivateAccountRequest;
+import com.backend.usermanagement.dto.request.UpdateProfileRequest;
 import com.backend.usermanagement.dto.response.PagedResponse;
+import com.backend.usermanagement.dto.response.ProfileResponse;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -94,6 +96,20 @@ public class UserController {
                                                       @AuthenticationPrincipal UserDetails userDetails) {
         userService.deactivateAccount(userDetails.getUsername(), request.getPassword());
         return ResponseEntity.ok("Account deactivated successfully");
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Get my profile", description = "Get the authenticated user's profile")
+    public ResponseEntity<ProfileResponse> getMyProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(userService.getMyProfile(userDetails.getUsername()));
+    }
+
+    @PutMapping("/me")
+    @Operation(summary = "Update my profile", description = "Update the authenticated user's profile")
+    public ResponseEntity<ProfileResponse> updateMyProfile(
+            @Valid @RequestBody UpdateProfileRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(userService.updateMyProfile(userDetails.getUsername(), request));
     }
 }
 
