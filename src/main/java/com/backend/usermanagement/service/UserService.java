@@ -2,7 +2,9 @@ package com.backend.usermanagement.service;
 
 import com.backend.usermanagement.domain.entity.Role;
 import com.backend.usermanagement.domain.entity.User;
+import com.backend.usermanagement.dto.request.UpdateProfileRequest;
 import com.backend.usermanagement.dto.response.PagedResponse;
+import com.backend.usermanagement.dto.response.ProfileResponse;
 import com.backend.usermanagement.dto.response.UserResponse;
 import com.backend.usermanagement.repository.RoleRepository;
 import com.backend.usermanagement.repository.UserRepository;
@@ -158,8 +160,7 @@ public class UserService {
     }
 
     @CacheEvict(value = "users", allEntries = true)  // Hesap deaktive edilince cache temizle
-    public void deactivateAccount(String email, String password) {
-        // Find user
+    public void deactivateAccount(String email, String password) {        // Find user
         User user = findByEmail(email);
 
         // Check if already deactivated
@@ -175,5 +176,25 @@ public class UserService {
         // Deactivate account
         user.deactivate();
         userRepository.save(user);
+    }
+
+    // Kendi profilini getir
+    public ProfileResponse getMyProfile(String email) {
+        User user = findByEmail(email);
+        return new ProfileResponse(user);
+    }
+
+    // Kendi profilini güncelle
+    @CacheEvict(value = "users", allEntries = true)
+    public ProfileResponse updateMyProfile(String email, UpdateProfileRequest request) {
+        User user = findByEmail(email);
+        user.updateProfile(
+                request.getFirstName(),
+                request.getLastName(),
+                request.getBio(),
+                request.getPhoneNumber()
+        );
+        userRepository.save(user);
+        return new ProfileResponse(user);
     }
 }
