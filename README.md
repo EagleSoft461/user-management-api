@@ -95,6 +95,11 @@ A modern and secure user management system REST API built with Spring Boot 3, Sp
 - ✅ QR code generation for authenticator apps
 - ✅ 2FA enable/disable/validate endpoints
 
+### v1.6.0 (Released)
+- User Profile Management (GET/PUT /api/users/me)
+- firstName, lastName, bio, phoneNumber fields
+- Full profile response with 2FA and email verification status
+
 ### v1.5.0 (Released)
 - ✅ Pagination for user listing (`GET /api/users/paged`)
 - ✅ Filtering by active status, email, role
