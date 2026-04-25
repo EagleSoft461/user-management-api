@@ -4,6 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Build](https://img.shields.io/badge/Build-Passing-success.svg)](https://github.com)
+[![CI](https://github.com/EagleSoft461/user-management-api/actions/workflows/ci.yml/badge.svg)](https://github.com/EagleSoft461/user-management-api/actions/workflows/ci.yml)
 
 A modern and secure user management system REST API built with Spring Boot 3, Spring Security, JWT authentication, and PostgreSQL.
 
