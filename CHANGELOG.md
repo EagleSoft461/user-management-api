@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-04-25
+
+### Added
+- API Versioning with URL-based strategy
+- `/api/v1/users` — V1 endpoints (simple list, backward compatible)
+- `/api/v2/users` — V2 endpoints (pagination + filtering as default)
+- `UserControllerV1` — maintains existing behavior for v1 clients
+- `UserControllerV2` — enhanced endpoints with pagination support
+- Both versions support full CRUD, profile management, and role operations
+
+### Technical
+- URL-based versioning (`/api/v1/`, `/api/v2/`)
+- Separate controller packages (`controller/v1`, `controller/v2`)
+- Shared service layer — no code duplication
+- Swagger UI shows both versions separately
+
 ## [1.6.0] - 2026-04-23
 
 ### Added
